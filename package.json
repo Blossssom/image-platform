@@ -8,11 +8,38 @@
     "dev:server": "pnpm --filter server start:dev",
     "build": "pnpm run --recursive build",
     "test": "pnpm run --recursive test",
-    "lint": "pnpm run --recursive lint",
+    "lint": "eslint . --ext .js,.ts,.vue",
+    "format": "prettier --write",
+    "type-check": "tsc --noEmit --project apps/server/tsconfig.json",
+    "type-check:client": "pnpm --filter client run type-check",
+    "type-check:server": "tsc --noEmit --project apps/server/tsconfig.json",
+    "type-check:all": "pnpm type-check:client && pnpm type-check:server",
+    "clean": "pnpm run --recursive clean && rm -rf node_modules",
     "setup": "./scripts/setup.sh"
   },
   "devDependencies": {
+    "@eslint/js": "^9.34.0",
+    "@nuxtjs/eslint-config-typescript": "^12.1.0",
     "@types/node": "^22.18.0",
-    "typescript": "^5.9.2"
+    "@typescript-eslint/eslint-plugin": "^8.42.0",
+    "@typescript-eslint/parser": "^8.42.0",
+    "cross-env": "^10.0.0",
+    "eslint": "^9.34.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-vue": "^10.4.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.6",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.42.0"
+  },
+  "lint-staged": {
+    "*.{js,ts,vue}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
   }
 }
