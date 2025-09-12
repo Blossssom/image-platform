@@ -40,8 +40,12 @@ export class Users {
   })
   displayName!: string | null;
 
-  @Column('character varying', { name: 'password_hash', length: 255 })
-  passwordHash!: string;
+  @Column('character varying', { 
+    name: 'password_hash', 
+    length: 255, 
+    nullable: true 
+  })
+  passwordHash!: string | null;
 
   @Column('character varying', {
     name: 'avatar_url',
@@ -52,6 +56,26 @@ export class Users {
 
   @Column('text', { name: 'bio', nullable: true })
   bio!: string | null;
+
+  @Column('character varying', { 
+    name: 'oauth_provider', 
+    nullable: true, 
+    length: 50 
+  })
+  oauthProvider!: string | null;
+
+  @Column('character varying', { 
+    name: 'oauth_provider_id', 
+    nullable: true, 
+    length: 255 
+  })
+  oauthProviderId!: string | null;
+
+  @Column('timestamp without time zone', {
+    name: 'oauth_connected_at',
+    nullable: true,
+  })
+  oauthConnectedAt!: Date | null;
 
   @Column('boolean', {
     name: 'is_verified',

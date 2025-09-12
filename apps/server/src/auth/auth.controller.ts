@@ -1,0 +1,136 @@
+import {
+  Controller,
+  Get,
+  Post,
+  UseGuards,
+  HttpCode,
+  HttpStatus,
+  Req,
+  Res,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiExcludeEndpoint,
+} from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
+import { Request, Response } from 'express';
+
+import { AuthService } from './auth.service';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { GetUser } from './decorators/get-user.decorator';
+import { Users } from '../entities/Users';
+
+@ApiTags('Authentication')
+@Controller('auth')
+export class AuthController {
+  constructor(private readonly authService: AuthService) {}
+
+
+  @Get('profile')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get current user profile' })
+  @ApiResponse({
+    status: 200,
+    description: 'User profile retrieved successfully',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getProfile(@GetUser() user: Users) {
+    return {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      displayName: user.displayName,
+      avatarUrl: user.avatarUrl,
+      bio: user.bio,
+      isVerified: user.isVerified || false,
+      isActive: user.isActive || false,
+      totalUploads: user.totalUploads || 0,
+      totalLikesReceived: user.totalLikesReceived || 0,
+      followerCount: user.followerCount || 0,
+      followingCount: user.followingCount || 0,
+      createdAt: user.createdAt,
+    };
+  }
+
+  @Post('logout')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Logout user' })
+  @ApiResponse({ status: 200, description: 'User successfully logged out' })
+  async logout() {
+    // For JWT tokens, logout is handled client-side by removing the token
+    // In future, we might implement token blacklisting
+    return { message: 'Successfully logged out' };
+  }
+
+  // OAuth Google Routes
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  @ApiOperation({ summary: 'Google OAuth login' })
+  @ApiResponse({ status: 302, description: 'Redirect to Google OAuth' })
+  async googleAuth(@Req() req: Request) {
+    // Guard redirects to Google
+  }
+
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  @ApiExcludeEndpoint()
+  async googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
+    const authResult = req.user as any;
+
+    // Redirect to frontend with token
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    res.redirect(
+      `${frontendUrl}/auth/callback?token=${authResult.accessToken}`
+    );
+  }
+
+  // OAuth GitHub Routes
+  @Get('github')
+  @UseGuards(AuthGuard('github'))
+  @ApiOperation({ summary: 'GitHub OAuth login' })
+  @ApiResponse({ status: 302, description: 'Redirect to GitHub OAuth' })
+  async githubAuth(@Req() req: Request) {
+    // Guard redirects to GitHub
+  }
+
+  @Get('github/callback')
+  @UseGuards(AuthGuard('github'))
+  @ApiExcludeEndpoint()
+  async githubAuthRedirect(@Req() req: Request, @Res() res: Response) {
+    const authResult = req.user as any;
+
+    // Redirect to frontend with token
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    res.redirect(
+      `${frontendUrl}/auth/callback?token=${authResult.accessToken}`
+    );
+  }
+
+  // OAuth Facebook Routes
+  @Get('facebook')
+  @UseGuards(AuthGuard('facebook'))
+  @ApiOperation({ summary: 'Facebook OAuth login' })
+  @ApiResponse({ status: 302, description: 'Redirect to Facebook OAuth' })
+  async facebookAuth(@Req() req: Request) {
+    // Guard redirects to Facebook
+  }
+
+  @Get('facebook/callback')
+  @UseGuards(AuthGuard('facebook'))
+  @ApiExcludeEndpoint()
+  async facebookAuthRedirect(@Req() req: Request, @Res() res: Response) {
+    const authResult = req.user as any;
+
+    // Redirect to frontend with token
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    res.redirect(
+      `${frontendUrl}/auth/callback?token=${authResult.accessToken}`
+    );
+  }
+}
