@@ -31,8 +31,8 @@ This document outlines the comprehensive implementation plan for the AI Image Pl
 
 - [x] JWT service implementation
 - [x] Auth guards and decorators
-- [x] Password hashing service
-- [ ] Refresh token mechanism
+- [x] OAuth strategies (Google, GitHub, Facebook)
+- [x] OAuth user validation and creation service
 
 **Deliverables:**
 
@@ -46,23 +46,26 @@ This document outlines the comprehensive implementation plan for the AI Image Pl
 **Priority: HIGH**
 **Dependencies: Phase 1**
 
-#### 2.1 Authentication Endpoints
+#### 2.1 OAuth Authentication Endpoints
 
 ```
-POST /auth/register
-POST /auth/login
-POST /auth/refresh
+GET /auth/google
+GET /auth/google/callback
+GET /auth/github
+GET /auth/github/callback
+GET /auth/facebook
+GET /auth/facebook/callback
 POST /auth/logout
 GET /auth/profile
 ```
 
-#### 2.2 User Management
+#### 2.2 OAuth User Management
 
-- [ ] User registration with validation
-- [ ] Email verification (optional for MVP)
-- [ ] Password reset functionality
-- [ ] User profile management
-- [ ] Rate limiting implementation
+- [x] OAuth user creation and validation
+- [x] Email-based account linking for existing users
+- [x] Unique username generation for OAuth users
+- [x] User profile management with OAuth data
+- [x] Rate limiting implementation for OAuth endpoints
 
 #### 2.3 Security Features
 
@@ -73,9 +76,9 @@ GET /auth/profile
 
 **Deliverables:**
 
-- Complete authentication system
-- User registration/login functionality
-- Security middleware
+- Complete OAuth authentication system with Google, GitHub, and Facebook
+- OAuth user creation and account linking functionality
+- Security middleware and rate limiting
 
 ### Phase 3: Image Management Core (Week 3-5)
 
@@ -410,7 +413,16 @@ src/
 ├── auth/                 # Phase 2
 │   ├── auth.controller.ts
 │   ├── auth.service.ts
-│   ├── jwt.strategy.ts
+│   ├── strategies/
+│   │   ├── jwt.strategy.ts
+│   │   ├── google.strategy.ts
+│   │   ├── github.strategy.ts
+│   │   └── facebook.strategy.ts
+│   ├── interfaces/
+│   │   ├── jwt-payload.interface.ts
+│   │   └── oauth-user.interface.ts
+│   ├── decorators/
+│   │   └── get-user.decorator.ts
 │   └── guards/
 ├── users/               # Phase 2
 │   ├── users.controller.ts
@@ -453,7 +465,7 @@ src/
 
 ### Key Dependencies & Packages
 
-#### Phase 1-2 (Foundation)
+#### Phase 1-2 (Foundation & OAuth)
 
 ```json
 {
@@ -464,10 +476,12 @@ src/
   "@nestjs/jwt": "^10.0.0",
   "@nestjs/passport": "^10.0.0",
   "@nestjs/throttler": "^5.0.0",
+  "passport-google-oauth20": "^2.0.0",
+  "passport-github2": "^0.1.12",
+  "passport-facebook": "^3.0.0",
   "typeorm": "^0.3.0",
   "pg": "^8.11.0",
   "@types/pg": "^8.10.0",
-  "bcrypt": "^5.1.0",
   "class-validator": "^0.14.0",
   "class-transformer": "^0.5.1"
 }

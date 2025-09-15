@@ -1,13 +1,15 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { AppService } from './app.service';
 import { AppController } from './app.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { getEnvFilePath } from './utils/env-file-path';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { ImagesModule } from './images/images.module';
 
 @Module({
   imports: [
@@ -37,6 +39,17 @@ import { AuthModule } from './auth/auth.module';
       useFactory: (configService: ConfigService) => ({
         throttlers: [
           {
+            name: 'short',
+            ttl: 1000, // 1 second
+            limit: 3, // 3 requests per second
+          },
+          {
+            name: 'medium', 
+            ttl: 10000, // 10 seconds
+            limit: 20, // 20 requests per 10 seconds
+          },
+          {
+            name: 'long',
             ttl: configService.get<number>('THROTTLE_TTL', 60000), // 1 minute
             limit: configService.get<number>('THROTTLE_LIMIT', 100), // 100 requests per minute
           },
@@ -46,8 +59,15 @@ import { AuthModule } from './auth/auth.module';
     }),
     UsersModule,
     AuthModule,
+    ImagesModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}

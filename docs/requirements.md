@@ -145,9 +145,14 @@ Canvas API: 고성능 그래프 렌더링
 │ • Assets │ │ • Workflows │
 └─────────────────┘ └─────────────────┘
 주요 API 엔드포인트
-typescript// 인증
-POST /api/auth/login
-POST /api/auth/register
+typescript// OAuth 인증
+GET /api/auth/google
+GET /api/auth/google/callback
+GET /api/auth/github
+GET /api/auth/github/callback
+GET /api/auth/facebook
+GET /api/auth/facebook/callback
+POST /api/auth/logout
 GET /api/auth/profile
 
 // 이미지 관리
@@ -165,13 +170,24 @@ GET /api/workflows/:id/download
 GET /api/search?q=query&filters={}
 데이터베이스 설계
 핵심 테이블
-sql-- 사용자
+sql-- 사용자 (OAuth 지원)
 CREATE TABLE users (
 id UUID PRIMARY KEY,
 email VARCHAR UNIQUE,
 username VARCHAR UNIQUE,
-password_hash VARCHAR,
-created_at TIMESTAMP
+display_name VARCHAR,
+avatar_url VARCHAR,
+bio TEXT,
+oauth_provider VARCHAR, -- 'google', 'github', 'facebook'
+oauth_provider_id VARCHAR,
+is_verified BOOLEAN DEFAULT FALSE,
+is_active BOOLEAN DEFAULT TRUE,
+total_uploads INTEGER DEFAULT 0,
+total_likes_received INTEGER DEFAULT 0,
+follower_count INTEGER DEFAULT 0,
+following_count INTEGER DEFAULT 0,
+created_at TIMESTAMP,
+updated_at TIMESTAMP
 );
 
 -- 이미지 (핵심 테이블)
@@ -258,10 +274,11 @@ Week 1-2: 환경 설정
 □ PostgreSQL 스키마 설계
 □ Docker 개발 환경 구성
 
-Week 3: 인증 시스템
-□ 회원가입/로그인 API
+Week 3: OAuth 인증 시스템
+□ Google/GitHub/Facebook OAuth 통합
 □ JWT 토큰 인증
-□ 프론트엔드 인증 상태 관리
+□ OAuth 사용자 생성 및 계정 연동
+□ 프론트엔드 OAuth 콜백 처리
 Phase 2: 핵심 기능 (5주)
 Week 4-5: 이미지 업로드 시스템
 □ 파일 업로드 API (Multer + Sharp)
@@ -300,7 +317,7 @@ Week 12: 배포 및 문서화
 □ 사용자 가이드 작성
 주요 마일스톤
 
-Week 3: 인증 시스템 완료
+Week 3: OAuth 인증 시스템 완료
 Week 7: 이미지 갤러리 + 메타데이터 완료
 Week 8: 워크플로우 시각화 완료
 Week 10: 모든 핵심 기능 완료

@@ -29,93 +29,95 @@ This document outlines the comprehensive REST API design for the AI Image Platfo
 
 ### Auth Endpoints
 
-#### POST /auth/register
-Register a new user account.
+#### OAuth Authentication
+The platform uses OAuth 2.0 for authentication with support for Google, GitHub, and Facebook providers.
 
-**Request Body:**
-```json
-{
-  "email": "string",
-  "username": "string",
-  "password": "string",
-  "displayName": "string?"
-}
-```
+#### GET /auth/google
+Initiate Google OAuth authentication.
 
-**Response:** `201 Created`
-```json
-{
-  "user": {
-    "id": "uuid",
-    "email": "string",
-    "username": "string",
-    "displayName": "string?",
-    "isVerified": false,
-    "createdAt": "ISO8601"
-  },
-  "accessToken": "string",
-  "refreshToken": "string"
-}
-```
+**Response:** `302 Redirect`
+- Redirects to Google OAuth consent screen
+
+**Rate Limit:** 10 requests per 15 minutes per IP
+
+#### GET /auth/google/callback
+Google OAuth callback endpoint.
+
+**Query Parameters:**
+- `code`: Authorization code from Google
+- `state`: State parameter for CSRF protection
+
+**Response:** `302 Redirect`
+- Redirects to frontend with access token: `${FRONTEND_URL}/auth/callback?token=${accessToken}`
 
 **Errors:**
-- `400` - Invalid input data
-- `409` - Email or username already exists
-- `422` - Validation errors
+- `400` - Invalid authorization code
+- `401` - OAuth authentication failed
 
-**Rate Limit:** 5 requests per 15 minutes per IP
+#### GET /auth/github
+Initiate GitHub OAuth authentication.
 
-#### POST /auth/login
-Authenticate user and receive access tokens.
+**Response:** `302 Redirect`
+- Redirects to GitHub OAuth consent screen
 
-**Request Body:**
-```json
-{
-  "email": "string",
-  "password": "string",
-  "rememberMe": "boolean?"
-}
-```
+**Rate Limit:** 10 requests per 15 minutes per IP
 
-**Response:** `200 OK`
-```json
-{
-  "user": {
-    "id": "uuid",
-    "email": "string",
-    "username": "string",
-    "displayName": "string?",
-    "avatarUrl": "string?",
-    "isVerified": "boolean",
-    "lastLoginAt": "ISO8601"
-  },
-  "accessToken": "string",
-  "refreshToken": "string"
-}
-```
+#### GET /auth/github/callback
+GitHub OAuth callback endpoint.
+
+**Query Parameters:**
+- `code`: Authorization code from GitHub
+- `state`: State parameter for CSRF protection
+
+**Response:** `302 Redirect`
+- Redirects to frontend with access token: `${FRONTEND_URL}/auth/callback?token=${accessToken}`
 
 **Errors:**
-- `401` - Invalid credentials
-- `423` - Account locked
-- `403` - Account not active
+- `400` - Invalid authorization code
+- `401` - OAuth authentication failed
 
-**Rate Limit:** 5 requests per 15 minutes per IP
+#### GET /auth/facebook
+Initiate Facebook OAuth authentication.
 
-#### POST /auth/refresh
-Refresh access token using refresh token.
+**Response:** `302 Redirect`
+- Redirects to Facebook OAuth consent screen
 
-**Request Body:**
+**Rate Limit:** 10 requests per 15 minutes per IP
+
+#### GET /auth/facebook/callback
+Facebook OAuth callback endpoint.
+
+**Query Parameters:**
+- `code`: Authorization code from Facebook
+- `state`: State parameter for CSRF protection
+
+**Response:** `302 Redirect`
+- Redirects to frontend with access token: `${FRONTEND_URL}/auth/callback?token=${accessToken}`
+
+**Errors:**
+- `400` - Invalid authorization code
+- `401` - OAuth authentication failed
+
+#### OAuth User Creation Process
+When a user authenticates via OAuth:
+1. Check if user exists with OAuth provider ID
+2. If not found, check if user exists by email
+3. If email exists, link OAuth account to existing user
+4. If user doesn't exist, create new user with:
+   - Verified status: `true` (OAuth users are pre-verified)
+   - Active status: `true`
+   - Unique username generated from email prefix
+   - Display name from OAuth provider
+   - Avatar URL from OAuth provider
+
+#### OAuth Token Response Format
+All OAuth callbacks redirect to frontend with JWT token containing:
 ```json
 {
-  "refreshToken": "string"
-}
-```
-
-**Response:** `200 OK`
-```json
-{
-  "accessToken": "string",
-  "refreshToken": "string"
+  "sub": "user-uuid",
+  "email": "string",
+  "exp": "number",
+  "iat": "number"
 }
 ```
 
