@@ -6,6 +6,7 @@ import { Users } from '../entities/Users';
 import { ImageProcessingService } from './services/image-processing.service';
 import { UploadImageDto } from './dto/upload-image.dto';
 import { ImageResponseDto } from './dto/image-response.dto';
+import { WorkflowsService } from '../workflows/workflows.service';
 
 @Injectable()
 export class ImagesService {
@@ -15,6 +16,7 @@ export class ImagesService {
     @InjectRepository(Images)
     private readonly imagesRepository: Repository<Images>,
     private readonly imageProcessingService: ImageProcessingService,
+    private readonly workflowsService: WorkflowsService,
   ) {}
 
   /**
@@ -52,7 +54,7 @@ export class ImagesService {
           raw: uploadData.generationParams,
         } : null,
         isPublic: uploadData.isPublic ?? true,
-        hasWorkflow: false, // Will be updated later if workflow is detected
+        hasWorkflow: false, // Will be updated if workflow is detected
         user,
         likeCount: 0,
         viewCount: 0,
@@ -60,10 +62,46 @@ export class ImagesService {
 
       const savedImage = await this.imagesRepository.save(image);
 
+      // Process workflow data if present in metadata or explicit workflow data
+      try {
+        let workflowCreated = false;
+
+        // Check if explicit workflow data was provided
+        if (uploadData.workflowData) {
+          await this.workflowsService.createWorkflow({
+            imageId: savedImage.id,
+            workflowData: uploadData.workflowData,
+            title: uploadData.workflowTitle || `Workflow for ${savedImage.title}`,
+            description: uploadData.workflowDescription,
+            category: uploadData.workflowCategory,
+            isPublic: uploadData.isPublic ?? true,
+          });
+          workflowCreated = true;
+        } else {
+          // Try to extract workflow from image metadata
+          const workflow = await this.workflowsService.processWorkflowFromImage(
+            savedImage.id, 
+            metadata
+          );
+          if (workflow) {
+            workflowCreated = true;
+          }
+        }
+
+        // Update image hasWorkflow flag if workflow was created
+        if (workflowCreated) {
+          await this.imagesRepository.update(savedImage.id, { hasWorkflow: true });
+          savedImage.hasWorkflow = true;
+        }
+      } catch (workflowError) {
+        // Log workflow processing error but don't fail the image upload
+        this.logger.warn(`Failed to process workflow for image ${savedImage.id}: ${(workflowError as Error).message}`);
+      }
+
       // Update user's total uploads count
       await this.updateUserUploadCount(user.id);
 
-      this.logger.log(`Successfully uploaded image: ${savedImage.id}`);
+      this.logger.log(`Successfully uploaded image: ${savedImage.id}${savedImage.hasWorkflow ? ' with workflow' : ''}`);
 
       return this.toImageResponseDto(savedImage);
     } catch (error) {

@@ -63,14 +63,14 @@ This document outlines the comprehensive implementation plan for the AI Image Pl
 #### 2.1 OAuth Authentication Endpoints
 
 ```
-GET /auth/google
-GET /auth/google/callback
-GET /auth/github
-GET /auth/github/callback
-GET /auth/facebook
-GET /auth/facebook/callback
-POST /auth/logout
-GET /auth/profile
+GET /auth/google                    [x]
+GET /auth/google/callback           [x]
+GET /auth/github                    [x]
+GET /auth/github/callback           [x]
+GET /auth/facebook                  [x]
+GET /auth/facebook/callback         [x]
+POST /auth/logout                   [x]
+GET /auth/profile                   [x]
 ```
 
 #### 2.2 OAuth User Management
@@ -102,7 +102,7 @@ GET /auth/profile
 #### 3.1 File Upload System
 
 ```
-POST /images/upload
+POST /images/upload                 [x]
 ```
 
 - [x] Multer configuration for file uploads
@@ -122,10 +122,10 @@ POST /images/upload
 #### 3.3 Image Storage & Retrieval
 
 ```
-GET /images
-GET /images/{id}
-GET /images/user/{userId}
-GET /images/my/images
+GET /images                         [x]
+GET /images/{id}                    [x]
+GET /images/user/{userId}           [x]
+GET /images/my/images               [x]
 ```
 
 - [x] Local file storage integration (organized by user)
@@ -137,8 +137,8 @@ GET /images/my/images
 #### 3.4 Image Interactions
 
 ```
-PUT /images/{id}
-DELETE /images/{id}
+PUT /images/{id}                    [x]
+DELETE /images/{id}                 [x]
 ```
 
 - [ ] Like/Unlike functionality
@@ -194,9 +194,9 @@ GET /search/suggestions
 #### 5.1 Core Workflow Processing
 
 ```
-GET /workflows/{imageId}
-POST /workflows/parse
-GET /workflows/{id}/download
+GET /workflows/{imageId}            [ ]
+POST /workflows/parse               [ ]
+GET /workflows/{id}/download        [ ]
 ```
 
 - [ ] ComfyUI JSON parser implementation

@@ -10,6 +10,7 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ImagesModule } from './images/images.module';
+import { WorkflowsModule } from './workflows/workflows.module';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { ImagesModule } from './images/images.module';
     UsersModule,
     AuthModule,
     ImagesModule,
+    WorkflowsModule,
   ],
   controllers: [AppController],
   providers: [

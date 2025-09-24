@@ -269,28 +269,28 @@ hasWorkflow: boolean; // 아이콘 표시용
 개발 계획 (12주)
 Phase 1: 기반 구축 (3주)
 Week 1-2: 환경 설정
-□ Nuxt.js 프로젝트 초기화
-□ Nest.js API 서버 구축
-□ PostgreSQL 스키마 설계
+☑️ Nuxt.js 프로젝트 초기화
+☑️ Nest.js API 서버 구축
+☑️ PostgreSQL 스키마 설계
 □ Docker 개발 환경 구성
 
 Week 3: OAuth 인증 시스템
-□ Google/GitHub/Facebook OAuth 통합
-□ JWT 토큰 인증
-□ OAuth 사용자 생성 및 계정 연동
+☑️ Google/GitHub/Facebook OAuth 통합
+☑️ JWT 토큰 인증
+☑️ OAuth 사용자 생성 및 계정 연동
 □ 프론트엔드 OAuth 콜백 처리
 Phase 2: 핵심 기능 (5주)
 Week 4-5: 이미지 업로드 시스템
-□ 파일 업로드 API (Multer + Sharp)
-□ S3 연동 및 썸네일 생성
+☑️ 파일 업로드 API (Multer + Sharp)
+☑️ 다중 해상도 썸네일 생성 (로컬 저장)
 □ 드래그앤드롭 업로드 UI
-□ 이미지 갤러리 구현
+☑️ 이미지 갤러리 API 구현
 
 Week 6-7: 메타데이터 처리
-□ EXIF 추출 및 파싱 시스템
+☑️ 기본 이미지 메타데이터 추출 (Sharp)
 □ A1111 파라미터 정규식 처리
 □ 메타데이터 표시 UI
-□ 검색 및 필터링 기능
+☑️ 이미지 검색 및 필터링 API
 
 Week 8: 워크플로우 시각화
 □ ComfyUI JSON 파서 구현
@@ -299,9 +299,9 @@ Week 8: 워크플로우 시각화
 □ 인터랙티브 뷰어 구현
 Phase 3: 고급 기능 (2주)
 Week 9-10: 사용자 기능
-□ 북마크/즐겨찾기 시스템
-□ 댓글 시스템
-□ 개인 갤러리
+☑️ 북마크/즐겨찾기 시스템 (엔티티 완성)
+☑️ 댓글 시스템 (엔티티 완성)
+☑️ 개인 갤러리 API
 □ 사용자 프로필 페이지
 Phase 4: 완성 및 배포 (2주)
 Week 11: 테스트 및 최적화
