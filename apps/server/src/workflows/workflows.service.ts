@@ -223,7 +223,8 @@ export class WorkflowsService {
       .createQueryBuilder('workflow')
       .leftJoinAndSelect('workflow.image', 'image')
       .where('workflow.isPublic = true')
-      .orderBy('workflow.downloadCount + workflow.favoriteCount', 'DESC')
+      .orderBy('workflow.downloadCount', 'DESC')
+      .addOrderBy('workflow.favoriteCount', 'DESC')
       .addOrderBy('workflow.createdAt', 'DESC')
       .take(limit)
       .getMany();

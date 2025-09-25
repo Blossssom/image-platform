@@ -29,8 +29,8 @@ import { WorkflowsModule } from './workflows/workflows.module';
           username: configService.get('DB_USERNAME'),
           password: configService.get<string>('DB_PASSWORD'),
           database: configService.get('DB_NAME'),
-          entities: [__dirname + '/../**/*.entity{.js,.ts}'],
-          synchronize: process.env.NODE_ENV !== 'production',
+          entities: [__dirname + '/entities/*.{js,ts}'],
+          synchronize: false, // Temporarily disabled due to index conflicts
         };
       },
       inject: [ConfigService],

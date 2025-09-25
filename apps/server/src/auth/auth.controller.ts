@@ -30,6 +30,36 @@ import { OAuthCallbackDto } from './dto/oauth-callback.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Post('test-login')
+  @AuthThrottle()
+  @ApiOperation({ summary: 'Test login (development only)' })
+  @ApiResponse({
+    status: 200,
+    description: 'Test token generated successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        accessToken: { type: 'string' },
+        user: { type: 'object' }
+      }
+    }
+  })
+  async testLogin() {
+    // Create or get a test user
+    const testUser = await this.authService.findOrCreateTestUser();
+    const token = this.authService.generateJwtToken(testUser);
+
+    return {
+      accessToken: token,
+      user: {
+        id: testUser.id,
+        email: testUser.email,
+        username: testUser.username,
+        displayName: testUser.displayName
+      }
+    };
+  }
+
   @Get('profile')
   @AuthThrottle()
   @UseGuards(JwtAuthGuard)

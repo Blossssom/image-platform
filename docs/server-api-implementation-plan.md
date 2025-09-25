@@ -113,10 +113,10 @@ POST /images/upload                 [x]
 
 #### 3.2 Enhanced Metadata Processing
 
-- [ ] **A1111ParameterParser**: Regex-based parameter extraction from image metadata
-- [ ] **ComfyUIWorkflowExtractor**: Extract models/LoRAs from embedded JSON
-- [ ] **MetadataValidator**: Parameter validation and normalization
-- [ ] **EXIF data extraction** with exifr integration
+- [x] **A1111ParameterParser**: Regex-based parameter extraction from image metadata
+- [x] **ComfyUIWorkflowExtractor**: Extract models/LoRAs from embedded JSON
+- [x] **MetadataValidator**: Parameter validation and normalization
+- [x] **EXIF data extraction** with Sharp integration
 - [ ] **Redis caching** for parsed metadata
 
 #### 3.3 Image Storage & Retrieval
@@ -150,7 +150,7 @@ DELETE /images/{id}                 [x]
 **Deliverables:**
 
 - [x] Complete image upload and processing pipeline
-- [ ] Advanced ComfyUI/A1111 metadata parsing
+- [x] Advanced ComfyUI/A1111 metadata parsing
 - [x] Image gallery with filtering
 - [ ] Basic social interactions (likes/bookmarks)
 
@@ -194,47 +194,47 @@ GET /search/suggestions
 #### 5.1 Core Workflow Processing
 
 ```
-GET /workflows/{imageId}            [ ]
-POST /workflows/parse               [ ]
-GET /workflows/{id}/download        [ ]
+GET /workflows/image/{imageId}      [x]
+POST /workflows/parse               [x]
+GET /workflows/{id}/download        [x]
 ```
 
-- [ ] ComfyUI JSON parser implementation
-- [ ] Workflow validation logic
-- [ ] Node relationship analysis
-- [ ] Metadata extraction from workflows
-- [ ] Workflow complexity scoring
+- [x] ComfyUI JSON parser implementation
+- [x] Workflow validation logic
+- [x] Node relationship analysis
+- [x] Metadata extraction from workflows
+- [x] Workflow complexity scoring
 
 #### 5.2 Enhanced Workflow Features
 
 ```
-GET /workflows/trending
-GET /workflows/recent
-POST /workflows/fork
-GET /workflows/validate
-POST /workflows/duplicate-check
+GET /workflows/trending             [x]
+GET /workflows/recent               [x]
+POST /workflows/{id}/fork           [x]
+GET /workflows/validate/{id}        [x]
+POST /workflows/duplicate-check     [x]
 ```
 
-- [ ] **Trending workflows** based on downloads/likes
-- [ ] **Recent workflows** with filtering
-- [ ] **Workflow forking** system for modifications
-- [ ] **Real-time validation** for uploaded workflows
-- [ ] **Duplicate detection** using workflow hashes
+- [x] **Trending workflows** based on downloads/likes
+- [x] **Recent workflows** with filtering
+- [x] **Workflow forking** system for modifications
+- [x] **Real-time validation** for uploaded workflows
+- [x] **Duplicate detection** using workflow hashes
 
 #### 5.3 Workflow Storage & Management
 
-- [ ] Workflow entity relationships
-- [ ] Hash-based duplicate detection
-- [ ] Download tracking
-- [ ] Workflow categorization
+- [x] Workflow entity relationships
+- [x] Hash-based duplicate detection
+- [x] Download tracking
+- [x] Workflow categorization
 - [ ] Workflow caching for performance
 
 **Deliverables:**
 
-- Comprehensive ComfyUI workflow parsing system
-- Workflow storage and retrieval
-- Advanced workflow features (trending, forking)
-- Workflow analysis and validation
+- [x] Comprehensive ComfyUI workflow parsing system
+- [x] Workflow storage and retrieval
+- [x] Advanced workflow features (trending, forking)
+- [x] Workflow analysis and validation
 
 ### Phase 6: Collections & User Profiles (Week 6-7)
 

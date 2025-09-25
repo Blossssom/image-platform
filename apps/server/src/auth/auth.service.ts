@@ -80,6 +80,37 @@ export class AuthService {
   }
 
   /**
+   * Generate JWT token for user
+   */
+  generateJwtToken(user: any): string {
+    const payload: JwtPayload = { sub: user.id, email: user.email };
+    return this.jwtService.sign(payload);
+  }
+
+  /**
+   * Find or create test user for development
+   */
+  async findOrCreateTestUser() {
+    const testEmail = 'test@example.com';
+    let user = await this.usersService.findByEmail(testEmail);
+
+    if (!user) {
+      user = await this.usersService.createOAuthUser({
+        email: testEmail,
+        username: 'testuser',
+        displayName: 'Test User',
+        avatarUrl: null,
+        oauthProvider: 'test',
+        oauthProviderId: 'test-123',
+        isActive: true,
+        isVerified: true,
+      });
+    }
+
+    return user;
+  }
+
+  /**
    * Generate unique username for OAuth users
    */
   private async generateUniqueUsername(baseUsername: string): Promise<string> {
