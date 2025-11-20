@@ -1,6 +1,6 @@
-# CLAUDE.md
+# GEMINI.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to GEMINI CLI when working with code in this repository.
 
 ## Project Structure
 
@@ -9,6 +9,13 @@ This is an AI Image Platform built as a full-stack monorepo with:
 - **Frontend**: Nuxt 4 application in `apps/client/`
 - **Backend**: NestJS API server in `apps/server/`
 - **Packages**: Shared utilities in `packages/` (currently empty)
+
+## Development Guidelines Reference (Detailed Rules)
+
+For detailed, application-specific development guidelines, refer to the following files:
+
+- **Frontend (Nuxt/Vue) Rules**: [`apps/client/vue-guidelines.md`](apps/client/vue-guidelines.md)
+- **Backend (NestJS) Rules**: [`apps/server/nest-guidelines.md`](apps/server/nest-guidelines.md)
 
 ## Important file
 
@@ -54,6 +61,7 @@ pnpm build          # Build all applications
 - @nuxt/ui for components
 - @nuxt/image for image handling
 - Development server runs on http://localhost:3000
+- Using storybook
 
 ### Backend (apps/server/)
 
@@ -61,6 +69,10 @@ pnpm build          # Build all applications
 - TypeORM for database operations
 - PostgreSQL database
 - Development server with watch mode
+
+### Test
+
+- Jest + Vue Testing Library
 
 ## Code Conventions
 

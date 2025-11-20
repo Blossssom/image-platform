@@ -7,11 +7,6 @@ import { getEnvFilePath } from './utils/env-file-path';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 
-import { UsersModule } from './users/users.module';
-import { AuthModule } from './auth/auth.module';
-import { ImagesModule } from './images/images.module';
-import { WorkflowsModule } from './workflows/workflows.module';
-
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -45,7 +40,7 @@ import { WorkflowsModule } from './workflows/workflows.module';
             limit: 3, // 3 requests per second
           },
           {
-            name: 'medium', 
+            name: 'medium',
             ttl: 10000, // 10 seconds
             limit: 20, // 20 requests per 10 seconds
           },
@@ -58,10 +53,6 @@ import { WorkflowsModule } from './workflows/workflows.module';
       }),
       inject: [ConfigService],
     }),
-    UsersModule,
-    AuthModule,
-    ImagesModule,
-    WorkflowsModule,
   ],
   controllers: [AppController],
   providers: [
