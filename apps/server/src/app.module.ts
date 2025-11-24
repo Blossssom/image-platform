@@ -6,6 +6,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { getEnvFilePath } from './utils/env-file-path';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { UsersModule } from './users/users.module';
+import { PostsModule } from './posts/posts.module';
+import { ImagesModule } from './images/images.module';
+import { CommentsModule } from './comments/comments.module';
+import { ResourcesModule } from './resources/resources.module';
+import { AuthModule } from './auth/auth.module';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -53,6 +60,15 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
       }),
       inject: [ConfigService],
     }),
+    // Shared Modules
+    CommonModule,
+    // Feature Modules
+    UsersModule,
+    PostsModule,
+    ImagesModule,
+    CommentsModule,
+    ResourcesModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [
