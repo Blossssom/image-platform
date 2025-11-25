@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as exifr from 'exifr';
@@ -6,19 +6,36 @@ import pngText from 'png-chunk-text';
 import extract from 'png-chunks-extract';
 import sharp from 'sharp';
 import { Images } from '../entities/Images';
-import { S3Service } from '../common/services/s3.service';
+import { StorageService } from '../common/services/storage.service';
 
 @Injectable()
 export class ImagesService {
   constructor(
     @InjectRepository(Images)
     private readonly imagesRepository: Repository<Images>,
-    private readonly s3Service: S3Service
+    @Inject('StorageService')
+    private readonly storageService: StorageService,
   ) {}
 
-  async processAndSaveImage(file: Express.Multer.File): Promise<Images> {
-    // 1. Parse metadata
-    const metadata = await this.parseMetadata(file.buffer);
+  async findOne(id: string): Promise<Images> {
+    const image = await this.imagesRepository.findOne({
+      where: { id },
+    });
+
+    if (!image) {
+      throw new NotFoundException('Image not found');
+    }
+
+    return image;
+  }
+
+
+  async processAndSaveImage(
+    file: Express.Multer.File,
+    postId: string,
+    generationInfo: object,
+  ): Promise<Images> {
+    // Metadata is now passed in from the frontend after being parsed and edited.
     const imageDimensions = await sharp(file.buffer).metadata();
 
     // 2. Create and upload thumbnail image (450px WebP)
@@ -26,10 +43,10 @@ export class ImagesService {
       .resize({ width: 450 })
       .webp({ quality: 80 })
       .toBuffer();
-    const thumbUrl = await this.s3Service.uploadFile(
+    const { url: thumbUrl } = await this.storageService.save(
       thumbBuffer,
       `thumb-${file.originalname.split('.')[0]}.webp`,
-      'image/webp'
+      'image/webp',
     );
 
     // 3. Create and upload preview image (1600px WebP)
@@ -37,32 +54,49 @@ export class ImagesService {
       .resize({ width: 1600, withoutEnlargement: true }) // Do not enlarge smaller images
       .webp({ quality: 85 })
       .toBuffer();
-    const previewUrl = await this.s3Service.uploadFile(
+    const { url: previewUrl } = await this.storageService.save(
       previewBuffer,
       `preview-${file.originalname.split('.')[0]}.webp`,
-      'image/webp'
+      'image/webp',
     );
 
-    // 4. Upload original image to S3
-    const originalUrl = await this.s3Service.uploadFile(
+    // 4. Upload original image
+    const { url: originalUrl } = await this.storageService.save(
       file.buffer,
       file.originalname,
-      file.mimetype
+      file.mimetype,
     );
 
     // 5. Create and save image entity to DB
     const newImage = this.imagesRepository.create({
+      post: { id: postId },
       urlOriginal: originalUrl,
       urlPreview: previewUrl,
       urlThumbnail: thumbUrl,
       width: imageDimensions.width,
       height: imageDimensions.height,
-      aspectRatio: (imageDimensions.width || 1) / (imageDimensions.height || 1),
-      generationInfo: metadata,
-      // Note: `post` or `userId` will be linked by the calling service (e.g., PostsService)
+      aspectRatio:
+        (imageDimensions.width || 1) / (imageDimensions.height || 1),
+      generationInfo: generationInfo,
     });
 
     return this.imagesRepository.save(newImage);
+  }
+
+  async getDownloadUrl(id: string): Promise<string> {
+    const image = await this.findOne(id);
+
+    // Extract key from the full URL for S3, or use path directly for local
+    let key: string;
+    try {
+      const url = new URL(image.urlOriginal);
+      key = url.pathname.substring(1); // Remove leading '/' from '/path/to/key'
+    } catch (error) {
+      // If new URL() fails, it's likely a local path already
+      key = image.urlOriginal;
+    }
+
+    return this.storageService.getPresignedUrl(key);
   }
 
   private async parseMetadata(buffer: Buffer): Promise<any> {

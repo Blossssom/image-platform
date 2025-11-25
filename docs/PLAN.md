@@ -1,13 +1,14 @@
 # Project Implementation Plan (AI Image Platform)
 
-> **Version:** 1.1 (Re-ordered)
-> **Date:** 2025-11-24
+> **Version:** 1.2 (Workflow Change)
+> **Date:** 2025-11-25
 > **Status:** In Progress
+>
+> **Development Workflow Note (as of 2025-11-25):** All backend development will follow a strict **"Implement -> Test -> User Confirmation"** cycle for each individual API endpoint. Work on a new endpoint will only commence after the previous one has been fully tested and approved by the user.
 
 ## 1. Overview
 
-This document outlines the detailed implementation plan for building the AI Image Platform, based on the specifications in `docs/requirements.md`. 
-**The plan has been re-ordered to prioritize core feature development before authentication to facilitate easier testing.**
+This document outlines the detailed implementation plan for building the AI Image Platform, based on the specifications in `docs/requirements.md`.
 
 The project will be developed by tackling **P0 (High Priority)** features first. The backend will be developed before the frontend. The development will adhere to the **Database-First** approach.
 
@@ -35,14 +36,28 @@ The project will be developed by tackling **P0 (High Priority)** features first.
 - [x] Write a unit test for `ImagesService`'s `parseMetadata` method.
 - [x] Write an integration test for the `POST /api/posts/upload` endpoint.
 - [x] **Note:** For initial development, the user associated with the upload will be mocked or temporarily ignored.
+- [x] **Update (2025-11-25):** The upload logic was refactored to accept pre-parsed `generationInfo` from the client, removing the need for backend parsing during the final upload.
 
 ### Task 2.3: Content Delivery APIs (High Priority)
-- [ ] Implement `GET /api/posts` with cursor-based pagination for infinite scrolling.
-- [ ] Implement `GET /api/images/:id` to fetch data for the detail page, including `generationInfo`.
-- [ ] Implement `GET /api/images/:id/download` to provide a pre-signed URL for the original image from S3.
+- [x] Implement `GET /api/posts` with cursor-based pagination for infinite scrolling.
+- [x] Implement `GET /api/images/:id` to fetch data for the detail page, including `generationInfo`.
+- [x] Implement `GET /api/images/:id/download` to provide a pre-signed URL for the original image from S3.
 
-### Task 2.4: Authentication (OAuth & JWT) (De-prioritized)
-- [ ] Create `AuthModule`, `AuthService`, `AuthController`.
+### Task 2.4: API Verification (Endpoint by Endpoint)
+- [ ] **Next Up:** Test `GET /api/posts` and await user confirmation.
+- [ ] Test `GET /api/images/:id` and await user confirmation.
+- [ ] Test `GET /api/images/:id/download` and await user confirmation.
+- [ ] Test `POST /posts/upload` (re-verify with new DTO logic) and await user confirmation.
+
+### Task 2.5: New Upload Flow (2-Step Process)
+- [ ] **Implement `POST /posts/metadata`:** Create the new endpoint for metadata extraction.
+  - [ ] Make `ImagesService.parseMetadata` public.
+  - [ ] Add the endpoint to `PostsController`.
+  - [ ] Write tests for the new endpoint.
+- [ ] **Await user confirmation.**
+
+### Task 2.6: Authentication (OAuth & JWT) (Paused)
+- [x] Create `AuthModule`, `AuthService`, `AuthController`.
 - [ ] Implement Passport.js strategies for Google and GitHub.
 - [ ] Define API endpoints for the OAuth flow (e.g., `/api/auth/google`, `/api/auth/google/callback`).
 - [ ] Generate a JWT upon successful login.

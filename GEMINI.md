@@ -21,6 +21,17 @@ For detailed, application-specific development guidelines, refer to the followin
 
 - **Planning document**: `docs/requirements.md` -
 
+## Development Workflow (User Mandated)
+
+A strict "Implement, Test, Confirm" workflow is required for all backend development.
+
+1.  **Implement a single API endpoint.** Focus on one endpoint at a time.
+2.  **Write and pass tests.** Create unit and/or E2E tests for the implemented endpoint and ensure they pass.
+3.  **Report and get confirmation.** Announce the completion and successful test results to the user.
+4.  **Proceed only after confirmation.** Do not move to the next task or endpoint until the user gives explicit approval.
+
+This workflow is also documented in `apps/server/GEMINI.md` and `docs/PLAN.md`.
+
 ## Development Commands
 
 ### Setup & Installation

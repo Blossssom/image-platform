@@ -2,22 +2,22 @@ import { Injectable, PipeTransform, ArgumentMetadata } from '@nestjs/common';
 
 @Injectable()
 export class SanitizationPipe implements PipeTransform {
-  transform(value: any, metadata: ArgumentMetadata): any {
+  transform(value: any, _metadata: ArgumentMetadata): any {
     if (typeof value === 'string') {
       return this.sanitizeString(value);
     }
-    
+
     if (typeof value === 'object' && value !== null) {
       return this.sanitizeObject(value);
     }
-    
+
     return value;
   }
 
   private sanitizeString(input: string): string {
     // Remove HTML tags
     let sanitized = input.replace(/<[^>]*>/g, '');
-    
+
     // Remove potentially dangerous characters for XSS
     sanitized = sanitized.replace(/[<>'"&]/g, (match) => {
       const entityMap: { [key: string]: string } = {
@@ -50,11 +50,11 @@ export class SanitizationPipe implements PipeTransform {
 
   private sanitizeObject(obj: any): any {
     const sanitized: any = Array.isArray(obj) ? [] : {};
-    
+
     for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
         const value = obj[key];
-        
+
         if (typeof value === 'string') {
           sanitized[key] = this.sanitizeString(value);
         } else if (typeof value === 'object' && value !== null) {
@@ -64,7 +64,7 @@ export class SanitizationPipe implements PipeTransform {
         }
       }
     }
-    
+
     return sanitized;
   }
 }

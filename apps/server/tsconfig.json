@@ -15,6 +15,6 @@
       "@shared/utils": ["../../packages/shared-utils/src"]
     }
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "test"]
+  "include": ["src/**/*", "test/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }

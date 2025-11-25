@@ -1,25 +1,26 @@
 import js from '@eslint/js';
 import typescript from 'typescript-eslint';
-import vue from 'eslint-plugin-vue';
+import pluginVue from 'eslint-plugin-vue';
 
 export default [
-  js.configs.recommended,
   {
     ignores: [
-      'node_modules/**',
-      'dist/**',
-      '.nuxt/**',
-      '.output/**',
-      'coverage/**',
-      '*.config.js',
-      '*.config.ts',
+      'node_modules',
+      'apps/server/dist',
+      'apps/client/.nuxt',
+      'apps/client/.output',
+      'coverage',
+      '**/*.config.js',
+      '**/*.config.ts',
     ],
   },
+  js.configs.recommended,
   ...typescript.configs.recommended,
+  ...pluginVue.configs['flat/recommended'],
   {
     languageOptions: {
       parserOptions: {
-        project: ['./tsconfig.json', './apps/*/tsconfig.json'],
+        project: ['./tsconfig.json', './apps/server/tsconfig.json', './apps/client/tsconfig.json'],
         tsconfigRootDir: import.meta.dirname,
       },
     },
@@ -34,13 +35,8 @@ export default [
       '@typescript-eslint/explicit-module-boundary-types': 'off',
     },
   },
-
-  // Nuxt.js config
   {
     files: ['apps/client/**/*.{js,ts,vue}'],
-    plugins: {
-      vue,
-    },
     languageOptions: {
       parserOptions: {
         parser: '@typescript-eslint/parser',
@@ -55,14 +51,11 @@ export default [
       },
     },
     rules: {
-      ...vue.configs['vue3-recommended'].rules,
       'vue/multi-word-component-names': 'off',
       'vue/no-multiple-template-root': 'off',
       'vue/require-default-prop': 'off',
     },
   },
-
-  // Nest.js config
   {
     files: ['apps/server/**/*.{js,ts}'],
     languageOptions: {

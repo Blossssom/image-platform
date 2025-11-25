@@ -1,12 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { ImagesService } from './images.service';
-import { S3Service } from '../common/services/s3.service';
+import { StorageService } from '../common/services/storage.service';
 import { Images } from '../entities/Images';
 
-// Mock S3Service
-const mockS3Service = {
-  uploadFile: jest.fn(),
+// Mock StorageService
+const mockStorageService = {
+  save: jest.fn(),
+  delete: jest.fn(),
 };
 
 // Simplified mock repository
@@ -23,8 +24,8 @@ describe('ImagesService', () => {
       providers: [
         ImagesService,
         {
-          provide: S3Service,
-          useValue: mockS3Service,
+          provide: 'StorageService',
+          useValue: mockStorageService,
         },
         {
           provide: getRepositoryToken(Images),
@@ -38,11 +39,50 @@ describe('ImagesService', () => {
     // Reset mocks before each test
     mockImagesRepository.create.mockClear();
     mockImagesRepository.save.mockClear();
-    mockS3Service.uploadFile.mockClear();
+    mockStorageService.save.mockClear();
+    mockStorageService.delete.mockClear();
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+  });
+
+  describe('processAndSaveImage', () => {
+    it('should process and save an image', async () => {
+      // A valid 1x1 pixel red PNG buffer
+      const Png1x1 =
+        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/wcAAwAB/epv2AAAAABJRU5ErkJggg==';
+      const file = {
+        buffer: Buffer.from(Png1x1, 'base64'),
+        originalname: 'test.png',
+        mimetype: 'image/png',
+      } as Express.Multer.File;
+      const postId = 'mock-post-id';
+      const generationInfo = { prompt: 'a cat' };
+
+      const saveResult = { url: 'mock-url', path: 'mock-path' };
+      mockStorageService.save.mockResolvedValue(saveResult);
+
+      const newImage = new Images();
+      mockImagesRepository.create.mockReturnValue(newImage);
+      mockImagesRepository.save.mockResolvedValue(newImage);
+
+      const result = await service.processAndSaveImage(
+        file,
+        postId,
+        generationInfo,
+      );
+
+      expect(mockStorageService.save).toHaveBeenCalledTimes(3);
+      expect(mockImagesRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          post: { id: postId },
+          generationInfo: generationInfo,
+        }),
+      );
+      expect(mockImagesRepository.save).toHaveBeenCalledWith(newImage);
+      expect(result).toBe(newImage);
+    });
   });
 
   describe('parseMetadata', () => {
@@ -52,9 +92,5 @@ describe('ImagesService', () => {
       const metadata = await (service as any).parseMetadata(invalidBuffer);
       expect(metadata).toEqual({ source: 'error', data: {} });
     });
-
-    // To test the success cases, actual image files with A1111 and ComfyUI
-    // metadata would be needed, which cannot be created here.
-    // This test serves as a demonstration of the overall testing structure.
   });
 });
