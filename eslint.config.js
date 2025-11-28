@@ -1,22 +1,21 @@
 import js from '@eslint/js';
 import typescript from 'typescript-eslint';
-import pluginVue from 'eslint-plugin-vue';
 
 export default [
   {
     ignores: [
       'node_modules',
       'apps/server/dist',
-      'apps/client/.nuxt',
-      'apps/client/.output',
+      'apps/client/.next',
+      'apps/client/out',
       'coverage',
       '**/*.config.js',
       '**/*.config.ts',
+      '**/*.config.mjs',
     ],
   },
   js.configs.recommended,
   ...typescript.configs.recommended,
-  ...pluginVue.configs['flat/recommended'],
   {
     languageOptions: {
       parserOptions: {
@@ -33,27 +32,6 @@ export default [
       ],
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
-    },
-  },
-  {
-    files: ['apps/client/**/*.{js,ts,vue}'],
-    languageOptions: {
-      parserOptions: {
-        parser: '@typescript-eslint/parser',
-        extraFileExtensions: ['.vue'],
-      },
-      globals: {
-        $fetch: 'readonly',
-        useNuxtApp: 'readonly',
-        navigateTo: 'readonly',
-        useRoute: 'readonly',
-        useRouter: 'readonly',
-      },
-    },
-    rules: {
-      'vue/multi-word-component-names': 'off',
-      'vue/no-multiple-template-root': 'off',
-      'vue/require-default-prop': 'off',
     },
   },
   {

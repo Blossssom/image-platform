@@ -6,7 +6,7 @@ This file provides guidance to GEMINI CLI when working with code in this reposit
 
 This is an AI Image Platform built as a full-stack monorepo with:
 
-- **Frontend**: Nuxt 4 application in `apps/client/`
+- **Frontend**: Next.js application in `apps/client/`
 - **Backend**: NestJS API server in `apps/server/`
 - **Packages**: Shared utilities in `packages/` (currently empty)
 
@@ -14,8 +14,8 @@ This is an AI Image Platform built as a full-stack monorepo with:
 
 For detailed, application-specific development guidelines, refer to the following files:
 
-- **Frontend (Nuxt/Vue) Rules**: [`apps/client/vue-guidelines.md`](apps/client/vue-guidelines.md)
-- **Backend (NestJS) Rules**: [`apps/server/nest-guidelines.md`](apps/server/nest-guidelines.md)
+- **Frontend (Next.js/React) Rules**: [`apps/client/GEMINI-NEXTJS.md`](apps/client/GEMINI-NEXTJS.md)
+- **Backend (NestJS) Rules**: [`apps/server/GEMINI-NESTJS.md`](apps/server/GEMINI-NESTJS.md)
 
 ## Important file
 
@@ -45,7 +45,7 @@ pnpm install        # Install dependencies
 
 ```bash
 pnpm dev            # Start both client and server
-pnpm dev:client     # Start Nuxt development server only
+pnpm dev:client     # Start Next.js development server only
 pnpm dev:server     # Start NestJS server in watch mode only
 ```
 
@@ -68,11 +68,9 @@ pnpm build          # Build all applications
 
 ### Frontend (apps/client/)
 
-- Nuxt 4 with Vue 3 and TypeScript
-- @nuxt/ui for components
-- @nuxt/image for image handling
+- Next.js 15+ with React 19 and TypeScript
+- CSS Modules (or standard CSS)
 - Development server runs on http://localhost:3000
-- Using storybook
 
 ### Backend (apps/server/)
 
@@ -83,7 +81,8 @@ pnpm build          # Build all applications
 
 ### Test
 
-- Jest + Vue Testing Library
+- Jest (Backend)
+- React Testing Library (Frontend - to be configured)
 
 ## Code Conventions
 
@@ -98,7 +97,7 @@ pnpm build          # Build all applications
 ### Linting (ESLint)
 
 - TypeScript recommended rules
-- Vue 3 recommended rules for frontend
+- React/Next.js recommended rules for frontend
 - NestJS conventions for backend
 - Unused variables warn (prefix with \_ to ignore)
 - Console/debugger allowed in development
