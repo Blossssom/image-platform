@@ -25,7 +25,7 @@ export class Images {
   })
   id: string;
 
-  @Column("uuid", { name: "user_id", nullable: true })
+  @Column("uuid", { name: "user_id" })
   userId: string | null;
 
   @Column("character varying", { name: "url_original", length: 255 })
