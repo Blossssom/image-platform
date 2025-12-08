@@ -2,12 +2,30 @@ import { Column, Entity, Index, JoinColumn, OneToOne } from "typeorm";
 import { Images } from "./Images";
 
 @Index("image_metadata_pkey", ["imageId"], { unique: true })
-@Index("idx_meta_model_hash", ["modelHash"], {})
-@Index("idx_meta_workflow", ["workflow"], {})
 @Entity("image_metadata", { schema: "public" })
 export class ImageMetadata {
   @Column("uuid", { primary: true, name: "image_id" })
   imageId: string;
+
+  @Column("character varying", { name: "title", nullable: true, length: 255 })
+  title: string | null;
+
+  @Column("text", { name: "description", nullable: true })
+  description: string | null;
+
+  @Column("character varying", {
+    name: "generation_tool",
+    nullable: true,
+    length: 50,
+  })
+  generationTool: string | null;
+
+  @Column("character varying", {
+    name: "generation_method",
+    nullable: true,
+    length: 50,
+  })
+  generationMethod: string | null;
 
   @Column("text", { name: "positive_prompt", nullable: true })
   positivePrompt: string | null;

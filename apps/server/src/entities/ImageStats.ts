@@ -1,5 +1,4 @@
-import { Column, Entity, Index, JoinColumn, OneToOne } from "typeorm";
-import { Images } from "./Images";
+import { Column, Entity, Index } from "typeorm";
 
 @Index("image_stats_pkey", ["imageId"], { unique: true })
 @Entity("image_stats", { schema: "public" })
@@ -19,10 +18,4 @@ export class ImageStats {
 
   @Column("bigint", { name: "like_count", nullable: true, default: () => "0" })
   likeCount: string | null;
-
-  @OneToOne(() => Images, (images) => images.imageStats, {
-    onDelete: "CASCADE",
-  })
-  @JoinColumn([{ name: "image_id", referencedColumnName: "id" }])
-  image: Images;
 }
