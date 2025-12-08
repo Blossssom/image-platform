@@ -4,18 +4,12 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
-  OneToMany,
   OneToOne,
 } from "typeorm";
 import { ImageMetadata } from "./ImageMetadata";
-import { ImageStats } from "./ImageStats";
-import { ImageTags } from "./ImageTags";
 import { Users } from "./Users";
-import { Reports } from "./Reports";
 
-@Index("idx_images_created_at", ["createdAt"], {})
 @Index("images_pkey", ["id"], { unique: true })
-@Index("idx_images_user_id", ["userId"], {})
 @Entity("images", { schema: "public" })
 export class Images {
   @Column("uuid", {
@@ -24,9 +18,6 @@ export class Images {
     default: () => "uuid_generate_v4()",
   })
   id: string;
-
-  @Column("uuid", { name: "user_id", nullable: true })
-  userId: string | null;
 
   @Column("character varying", { name: "url_original", length: 255 })
   urlOriginal: string;
@@ -47,6 +38,13 @@ export class Images {
   })
   isNsfw: boolean | null;
 
+  @Column("character varying", {
+    name: "status",
+    length: 20,
+    default: () => "'DRAFT'",
+  })
+  status: string;
+
   @Column("timestamp with time zone", {
     name: "created_at",
     nullable: true,
@@ -57,16 +55,7 @@ export class Images {
   @OneToOne(() => ImageMetadata, (imageMetadata) => imageMetadata.image)
   imageMetadata: ImageMetadata;
 
-  @OneToOne(() => ImageStats, (imageStats) => imageStats.image)
-  imageStats: ImageStats;
-
-  @OneToMany(() => ImageTags, (imageTags) => imageTags.image)
-  imageTags: ImageTags[];
-
   @ManyToOne(() => Users, (users) => users.images, { onDelete: "SET NULL" })
   @JoinColumn([{ name: "user_id", referencedColumnName: "id" }])
   user: Users;
-
-  @OneToMany(() => Reports, (reports) => reports.image)
-  reports: Reports[];
 }

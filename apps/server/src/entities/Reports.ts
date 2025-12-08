@@ -1,18 +1,13 @@
-import {
-  Column,
-  Entity,
-  Index,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from "typeorm";
-import { Images } from "./Images";
+import { Column, Entity, Index, PrimaryGeneratedColumn } from "typeorm";
 
 @Index("reports_pkey", ["id"], { unique: true })
 @Entity("reports", { schema: "public" })
 export class Reports {
   @PrimaryGeneratedColumn({ type: "integer", name: "id" })
   id: number;
+
+  @Column("uuid", { name: "image_id", nullable: true })
+  imageId: string | null;
 
   @Column("character varying", { name: "reason", length: 50 })
   reason: string;
@@ -37,8 +32,4 @@ export class Reports {
     default: () => "now()",
   })
   createdAt: Date | null;
-
-  @ManyToOne(() => Images, (images) => images.reports, { onDelete: "CASCADE" })
-  @JoinColumn([{ name: "image_id", referencedColumnName: "id" }])
-  image: Images;
 }

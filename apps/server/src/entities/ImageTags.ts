@@ -1,5 +1,4 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne } from "typeorm";
-import { Images } from "./Images";
 import { Tags } from "./Tags";
 
 @Index("image_tags_pkey", ["imageId", "tagId"], { unique: true })
@@ -18,12 +17,6 @@ export class ImageTags {
     default: () => "now()",
   })
   createdAt: Date | null;
-
-  @ManyToOne(() => Images, (images) => images.imageTags, {
-    onDelete: "CASCADE",
-  })
-  @JoinColumn([{ name: "image_id", referencedColumnName: "id" }])
-  image: Images;
 
   @ManyToOne(() => Tags, (tags) => tags.imageTags, { onDelete: "CASCADE" })
   @JoinColumn([{ name: "tag_id", referencedColumnName: "id" }])

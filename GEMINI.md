@@ -8,29 +8,46 @@ This is an AI Image Platform built as a full-stack monorepo with:
 
 - **Frontend**: Next.js application in `apps/client/`
 - **Backend**: NestJS API server in `apps/server/`
-- **Packages**: Shared utilities in `packages/` (currently empty)
+- **Infra**: Docker Compose & Configuration in `infra/` (Postgres, Redis, Elasticsearch)
+- **Docs**: Project Specifications in `docs/specs/`
+- **Packages**: Shared utilities in `packages/`
 
-## Development Guidelines Reference (Detailed Rules)
+## Documentation & Truth Sources (Crucial)
 
-For detailed, application-specific development guidelines, refer to the following files:
+All development must strictly follow the specifications defined in `docs/specs/`.
 
-- **Frontend (Next.js/React) Rules**: [`apps/client/GEMINI-NEXTJS.md`](apps/client/GEMINI-NEXTJS.md)
-- **Backend (NestJS) Rules**: [`apps/server/GEMINI-NESTJS.md`](apps/server/GEMINI-NESTJS.md)
+- **01_requirements.md**: Business logic & functional requirements.
+- **02_database.md**: Database Schema (TypeORM) & Elasticsearch Mapping.
+- **03_api_spec.md**: API Endpoints, Request/Response formats, and Error codes.
+- **plans/backend_wbs.md**: Development Roadmap.
 
-## Important file
+**⚠️ Rule:** Before writing any code, ALWAYS read the relevant section in `docs/specs/` first.
 
-- **Planning document**: `docs/requirements.md` -
+## Development Guidelines Reference
 
-## Development Workflow (User Mandated)
+- **Frontend Rules**: [`apps/client/GEMINI-NEXTJS.md`](apps/client/GEMINI-NEXTJS.md)
+- **Backend Rules**: [`apps/server/GEMINI-NESTJS.md`](apps/server/GEMINI-NESTJS.md)
 
-A strict "Implement, Test, Confirm" workflow is required for all backend development.
+## Development Workflow (Strict: Endpoint-Centric)
 
-1.  **Implement a single API endpoint.** Focus on one endpoint at a time.
-2.  **Write and pass tests.** Create unit and/or E2E tests for the implemented endpoint and ensure they pass.
-3.  **Report and get confirmation.** Announce the completion and successful test results to the user.
-4.  **Proceed only after confirmation.** Do not move to the next task or endpoint until the user gives explicit approval.
+To prevent chaotic development ("spaghetti code"), you must strictly follow this **Single Endpoint Cycle**.
+**⛔ DO NOT move to the next endpoint until the current one is 100% complete and confirmed.**
 
-This workflow is also documented in `apps/server/GEMINI.md` and `docs/PLAN.md`.
+1.  **Select Target:** Pick **ONE** endpoint from `docs/specs/03_api_spec.md` (e.g., `POST /images/upload`).
+2.  **Spec & Schema Check:**
+    * Read the API spec for inputs/outputs.
+    * Ensure required Entities exist in `docs/specs/02_database.md`.
+3.  **Implement & Document:**
+    * Create DTOs with **Swagger Decorators** (`@ApiProperty`, `@IsString`, etc.).
+    * Implement Service & Controller logic.
+    * Apply `@ApiOperation`, `@ApiResponse` decorators to the Controller.
+4.  **Verification (Swagger & Function):**
+    * Start server: `pnpm dev:server`.
+    * **Check Swagger UI:** Verify `http://localhost:3000/api` (or configured path) matches the Spec.
+    * **Test:** Curl / Postman / Unit Test.
+5.  **Report & Wait:**
+    * Summarize the work.
+    * **STOP** and ask the user: *"Endpoint X is done. Shall I proceed to Y?"*
 
 ## Development Commands
 
@@ -67,17 +84,19 @@ pnpm build          # Build all applications
 ## Tech Stack Details
 
 ### Frontend (apps/client/)
-
-- Next.js 15+ with React 19 and TypeScript
-- CSS Modules (or standard CSS)
-- Development server runs on http://localhost:3000
+- Framework: Next.js 15+ (App Router)
+- State: Jotai (Client), React Query (Server)
+- UI: FSD Architecture, Shadcn UI
 
 ### Backend (apps/server/)
-
-- NestJS with TypeScript
-- TypeORM for database operations
-- PostgreSQL database
-- Development server with watch mode
+- Framework: NestJS
+- Database: PostgreSQL (Primary), Redis (Cache/Queue)
+- Search: Elasticsearch (w/ nori analyzer)
+- ORM: TypeORM
+- Storage Strategy:
+- API Docs: Swagger (OpenAPI) - via @nestjs/swagger
+- Dev: Local File System (/uploads) via ServeStaticModule.
+- Prod: AWS S3.
 
 ### Test
 
@@ -86,27 +105,15 @@ pnpm build          # Build all applications
 
 ## Code Conventions
 
-### Formatting (Prettier)
+### General
+- 2-space indentation, Single quotes, Semicolons required.
+- Strict Typing: No any type allowed unless absolutely necessary.
 
-- 2-space indentation
-- Single quotes
-- Semicolons required
-- 80 character line width
-- Unix line endings (lf)
-
-### Linting (ESLint)
-
-- TypeScript recommended rules
-- React/Next.js recommended rules for frontend
-- NestJS conventions for backend
-- Unused variables warn (prefix with \_ to ignore)
-- Console/debugger allowed in development
-
-### Git Commits
-
-- Format: `type(scope): description`
-- Types: feat, fix, docs, style, refactor, test, chore
-- Enforced by commit-msg hook
+### Backend Specifics
+- Swagger Mandatory: All DTOs and Controllers MUST have Swagger decorators to generate accurate API docs.
+- Follow Controller-Service-Repository pattern.
+- Use DTOs with class-validator for all inputs.
+- Use TypeORM Entities defined in src/entities.
 
 ## Monorepo Architecture
 
@@ -122,14 +129,12 @@ This is a pnpm workspace with:
 The server uses TypeORM with PostgreSQL. Database configuration is handled through NestJS configuration module.
 
 ## Important Notes
-
 - Always run type checking, linting, and tests before considering a task complete
 - The project uses Husky for Git hooks with pre-commit linting
 - Both client and server have their own package.json with specific scripts
 - Use pnpm workspaces commands to target specific apps when needed
 
-## Job History
-
-- Always record your work with the date in docs/log.
-- Create a .md file name with the year and date and continue the records you worked on that date. like 2025_09_11.md
-- The details of each task are as detailed as possible, but please write a summary
+## Job History (Log)
+- Mandatory: Record your work summary with the date in docs/log/YYYY_MM_DD.md.
+- Example: docs/log/2025_12_08.md.
+- Keep the log concise but cover all completed tasks and key decisions.
