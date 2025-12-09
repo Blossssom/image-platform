@@ -133,6 +133,7 @@ The server uses TypeORM with PostgreSQL. Database configuration is handled throu
 - The project uses Husky for Git hooks with pre-commit linting
 - Both client and server have their own package.json with specific scripts
 - Use pnpm workspaces commands to target specific apps when needed
+- Please response in Korean.
 
 ## Job History (Log)
 - Mandatory: Record your work summary with the date in docs/log/YYYY_MM_DD.md.

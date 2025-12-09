@@ -5,18 +5,14 @@ import {
   JoinColumn,
   ManyToOne,
   OneToOne,
+  PrimaryGeneratedColumn,
 } from "typeorm";
 import { ImageMetadata } from "./ImageMetadata";
 import { Users } from "./Users";
 
-@Index("images_pkey", ["id"], { unique: true })
 @Entity("images", { schema: "public" })
 export class Images {
-  @Column("uuid", {
-    primary: true,
-    name: "id",
-    default: () => "uuid_generate_v4()",
-  })
+  @PrimaryGeneratedColumn("uuid", { name: "id" })
   id: string;
 
   @Column("character varying", { name: "url_original", length: 255 })

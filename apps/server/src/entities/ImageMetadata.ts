@@ -1,7 +1,6 @@
 import { Column, Entity, Index, JoinColumn, OneToOne } from "typeorm";
 import { Images } from "./Images";
 
-@Index("image_metadata_pkey", ["imageId"], { unique: true })
 @Entity("image_metadata", { schema: "public" })
 export class ImageMetadata {
   @Column("uuid", { primary: true, name: "image_id" })
@@ -49,7 +48,6 @@ export class ImageMetadata {
   @Column("double precision", {
     name: "cfg_scale",
     nullable: true,
-    precision: 53,
   })
   cfgScale: number | null;
 

@@ -1,15 +1,10 @@
-import { Column, Entity, Index, OneToMany } from "typeorm";
+import { Column, Entity, Index, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Images } from "./Images";
 
 @Index("users_email_key", ["email"], { unique: true })
-@Index("users_pkey", ["id"], { unique: true })
 @Entity("users", { schema: "public" })
 export class Users {
-  @Column("uuid", {
-    primary: true,
-    name: "id",
-    default: () => "uuid_generate_v4()",
-  })
+  @PrimaryGeneratedColumn("uuid", { name: "id" })
   id: string;
 
   @Column("character varying", {
