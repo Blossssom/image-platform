@@ -9,12 +9,14 @@ import { StorageModule } from '../common/file-storage/storage.module';
 import { ImagesRepository } from './images.repository';
 import { Users } from '../entities/Users';
 
+import { MetadataService } from './metadata.service';
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([Images, ImageMetadata, Users]),
     StorageModule,
   ],
   controllers: [ImagesController],
-  providers: [ImagesService, ImagesRepository],
+  providers: [ImagesService, ImagesRepository, MetadataService],
 })
 export class ImagesModule {}

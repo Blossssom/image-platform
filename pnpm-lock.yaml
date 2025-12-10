@@ -151,6 +151,9 @@ importers:
       '@nestjs/testing':
         specifier: ^11.0.1
         version: 11.1.6(@nestjs/common@11.1.6(class-transformer@0.5.1)(class-validator@0.14.3)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.6)(@nestjs/platform-express@11.1.6)
+      '@types/exif-reader':
+        specifier: ^2.0.2
+        version: 2.0.2
       '@types/express':
         specifier: ^5.0.0
         version: 5.0.3
@@ -1169,6 +1172,10 @@ packages:
 
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
+
+  '@types/exif-reader@2.0.2':
+    resolution: {integrity: sha512-p6KWhw3nlLQ5Zhr/ZHP93IEY6LT4dldw1A5qB3Hw3Cw81bFVupoC4kkKYAXk+HfVQbT8+RJ1r8OS6w2xMT5Gww==}
+    deprecated: This is a stub types definition. exif-reader provides its own type definitions, so you do not need this installed.
 
   '@types/express-serve-static-core@5.0.7':
     resolution: {integrity: sha512-R+33OsgWw7rOhD1emjU7dzCDHucJrgJXMA5PYCzJxVil0dsyx5iBEPHqpPfiKNJQb7lZ1vxwoLR4Z87bBUpeGQ==}
@@ -2364,6 +2371,9 @@ packages:
   execa@5.1.1:
     resolution: {integrity: sha512-8uSpZZocAZRBAPIEINJj3Lo9HyGitllczc27Eh5YYojjMFMn8yHMDMaUHE2Jqfq05D/wucwI4JGURyXt1vchyg==}
     engines: {node: '>=10'}
+
+  exif-reader@2.0.2:
+    resolution: {integrity: sha512-CVFqcwdwFe2GnbbW7/Q7sUhVP5Ilaw7fuXQc6ad3AbX20uGfHhXTpkF/hQHPrtOuys9elFVgsUkvwfhfvjDa1A==}
 
   exit-x@0.2.2:
     resolution: {integrity: sha512-+I6B/IkJc1o/2tiURyz/ivu/O0nKNEArIUB5O7zBrlDVJr22SCLH3xTeEry428LvFhRzIA1g8izguxJ/gbNcVQ==}
@@ -5539,6 +5549,10 @@ snapshots:
 
   '@types/estree@1.0.8': {}
 
+  '@types/exif-reader@2.0.2':
+    dependencies:
+      exif-reader: 2.0.2
+
   '@types/express-serve-static-core@5.0.7':
     dependencies:
       '@types/node': 22.18.0
@@ -6941,6 +6955,8 @@ snapshots:
       onetime: 5.1.2
       signal-exit: 3.0.7
       strip-final-newline: 2.0.0
+
+  exif-reader@2.0.2: {}
 
   exit-x@0.2.2: {}
 
