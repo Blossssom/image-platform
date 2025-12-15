@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Images } from '../entities/Images';
 
 import { ImageMetadata } from '../entities/ImageMetadata';
@@ -12,24 +12,31 @@ export class ImagesRepository {
     private readonly repository: Repository<Images>,
     @InjectRepository(ImageMetadata)
     private readonly metadataRepository: Repository<ImageMetadata>,
+    private readonly dataSource: DataSource,
   ) {}
 
   create(data: Partial<Images>): Images {
     return this.repository.create(data);
   }
 
+  async findOne(id: string): Promise<Images | null> {
+    return this.repository.findOne({ where: { id }, relations: ['imageMetadata'] });
+  }
+
   async save(image: Images, metadata?: Partial<ImageMetadata>): Promise<Images> {
-    const savedImage = await this.repository.save(image);
+    return this.dataSource.transaction(async (manager) => {
+      const savedImage = await manager.save(Images, image);
 
-    if (metadata) {
-      const imageMetadata = this.metadataRepository.create({
-        ...metadata,
-        imageId: savedImage.id,
-      });
-      await this.metadataRepository.save(imageMetadata);
-      savedImage.imageMetadata = imageMetadata;
-    }
+      if (metadata) {
+        const imageMetadata = manager.create(ImageMetadata, {
+          ...metadata,
+          imageId: savedImage.id,
+        });
+        await manager.save(ImageMetadata, imageMetadata);
+        savedImage.imageMetadata = imageMetadata;
+      }
 
-    return savedImage;
+      return savedImage;
+    });
   }
 }

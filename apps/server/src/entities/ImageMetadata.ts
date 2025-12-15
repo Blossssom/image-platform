@@ -60,6 +60,15 @@ export class ImageMetadata {
   @Column("jsonb", { name: "raw_params", nullable: true })
   rawParams: object | null;
 
+  @Column("jsonb", { name: "resources", nullable: true })
+  resources: object[] | null;
+
+  @Column("jsonb", { name: "tags", nullable: true })
+  tags: string[] | null;
+
+  @Column("boolean", { name: "is_nsfw", nullable: true, default: false })
+  isNsfw: boolean | null;
+
   @OneToOne(() => Images, (images) => images.imageMetadata, {
     onDelete: "CASCADE",
   })
