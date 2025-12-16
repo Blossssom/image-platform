@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import sharp from 'sharp';
 import { ImageMetadata } from '../entities/ImageMetadata';
-import { GenerationTool, GenerationMethod } from './constants';
+import { GenerationTool, GenerationMethod } from '@shared/types';
 
 import exif from 'exif-reader';
 

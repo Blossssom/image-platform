@@ -5,8 +5,11 @@ import { UploadImageDto } from './dto/upload-image.dto';
 import { PublishImageDto } from './dto/publish-image.dto';
 import sharp from 'sharp';
 import { IUploadImageResponse } from '@shared/types';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { ImagePublishedEvent } from './events/image-published.event';
 
 import { MetadataService } from './metadata.service';
+// import { SearchService } from '../search/search.service'; // Decoupled
 
 @Injectable()
 export class ImagesService {
@@ -14,6 +17,8 @@ export class ImagesService {
     private readonly imagesRepository: ImagesRepository,
     private readonly storageService: StorageService,
     private readonly metadataService: MetadataService,
+    private readonly eventEmitter: EventEmitter2,
+    // private readonly searchService: SearchService,
   ) {}
 
   async uploadImage(file: Express.Multer.File, dto: UploadImageDto): Promise<IUploadImageResponse> {
@@ -80,11 +85,24 @@ export class ImagesService {
     };
 
     // 3. Save updates
-    await this.imagesRepository.save(image, metadataUpdates);
-
-    return {
-      id: image.id,
-      status: image.status,
-    };
+    await this.imagesRepository.saveMetadata(image.id, metadataUpdates);
+      
+    // Update image status to PUBLISHED
+    image.status = 'PUBLISHED';
+    // Manually merge for Elasticsearch indexing purposes (does not affect DB save above)
+    if (image.imageMetadata) {
+        Object.assign(image.imageMetadata, metadataUpdates);
+    }
+    
+    await this.imagesRepository.save(image);
+      
+    // Index to Elasticsearch (Decoupled via Event)
+    // await this.searchService.indexImage(image);
+    this.eventEmitter.emit(
+        'image.published',
+        new ImagePublishedEvent(image.id),
+    );
+     
+    return image;
   }
 }

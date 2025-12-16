@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsString, IsOptional, IsArray, IsEnum, IsBoolean, Length } from 'class-validator';
-import { GenerationTool, GenerationMethod } from '../constants';
+import { GenerationTool, GenerationMethod } from '@shared/types';
 
 export class PublishImageDto {
   @ApiProperty({ description: 'Title of the image', maxLength: 255 })

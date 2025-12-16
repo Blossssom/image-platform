@@ -1,10 +1,13 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AppController } from './app.controller';
+
 import { AppService } from './app.service';
 import { StorageModule } from './common/file-storage/storage.module';
 import { ImagesModule } from './images/images.module';
+import { SearchModule } from './search/search.module';
 
 @Module({
   imports: [
@@ -34,6 +37,10 @@ import { ImagesModule } from './images/images.module';
     }),
     StorageModule,
     ImagesModule,
+    StorageModule,
+    ImagesModule,
+    SearchModule,
+    EventEmitterModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -23,3 +23,16 @@ export interface IUploadImageResponse {
   id: string;
   url: string;
 }
+
+export enum GenerationTool {
+  WebUI = 'WebUI',
+  ComfyUI = 'ComfyUI',
+}
+
+export enum GenerationMethod {
+  Txt2Img = 'txt2img',
+  Img2Img = 'img2img',
+  Inpainting = 'inpainting',
+  ControlNet = 'controlnet',
+  Other = 'other',
+}

@@ -39,4 +39,7 @@ export class ImagesRepository {
       return savedImage;
     });
   }
+  async saveMetadata(imageId: string, metadata: Partial<ImageMetadata>): Promise<void> {
+    await this.metadataRepository.update({ imageId }, metadata);
+  }
 }
