@@ -20,10 +20,16 @@ export class ImagesRepository {
   }
 
   async findOne(id: string): Promise<Images | null> {
-    return this.repository.findOne({ where: { id }, relations: ['imageMetadata'] });
+    return this.repository.findOne({
+      where: { id },
+      relations: ['imageMetadata', 'user'],
+    });
   }
 
-  async save(image: Images, metadata?: Partial<ImageMetadata>): Promise<Images> {
+  async save(
+    image: Images,
+    metadata?: Partial<ImageMetadata>,
+  ): Promise<Images> {
     return this.dataSource.transaction(async (manager) => {
       const savedImage = await manager.save(Images, image);
 
@@ -39,7 +45,10 @@ export class ImagesRepository {
       return savedImage;
     });
   }
-  async saveMetadata(imageId: string, metadata: Partial<ImageMetadata>): Promise<void> {
+  async saveMetadata(
+    imageId: string,
+    metadata: Partial<ImageMetadata>,
+  ): Promise<void> {
     await this.metadataRepository.update({ imageId }, metadata);
   }
 }

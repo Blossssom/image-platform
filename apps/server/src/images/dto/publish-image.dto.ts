@@ -1,5 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsOptional, IsArray, IsEnum, IsBoolean, Length } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsArray,
+  IsEnum,
+  IsBoolean,
+  Length,
+} from 'class-validator';
 import { GenerationTool, GenerationMethod } from '@shared/types';
 
 export class PublishImageDto {
@@ -19,17 +26,25 @@ export class PublishImageDto {
   @IsString({ each: true })
   tags?: string[];
 
-  @ApiPropertyOptional({ description: 'Whether the image contains NSFW content' })
+  @ApiPropertyOptional({
+    description: 'Whether the image contains NSFW content',
+  })
   @IsOptional()
   @IsBoolean()
   isNsfw?: boolean;
 
-  @ApiPropertyOptional({ enum: GenerationTool, description: 'Generation tool used' })
+  @ApiPropertyOptional({
+    enum: GenerationTool,
+    description: 'Generation tool used',
+  })
   @IsOptional()
   @IsEnum(GenerationTool)
   generationTool?: GenerationTool;
 
-  @ApiPropertyOptional({ enum: GenerationMethod, description: 'Generation method used' })
+  @ApiPropertyOptional({
+    enum: GenerationMethod,
+    description: 'Generation method used',
+  })
   @IsOptional()
   @IsEnum(GenerationMethod)
   generationMethod?: GenerationMethod;
@@ -56,7 +71,7 @@ export class PublishImageDto {
 
   @ApiPropertyOptional({ description: 'Steps count' })
   @IsOptional()
-  // @IsNumber() - incoming might be string or number, handled by validation pipe or manual cast if needed. 
+  // @IsNumber() - incoming might be string or number, handled by validation pipe or manual cast if needed.
   // Let's stick to simple types usually used in JSON bodies for update.
   steps?: number;
 
@@ -69,14 +84,14 @@ export class PublishImageDto {
   @IsString()
   seed?: string;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'List of used resources (LoRA, Checkpoint, etc.)',
-    example: [{ type: 'lora', name: 'KoreanDollLikeness', weight: 0.8 }]
+    example: [{ type: 'lora', name: 'KoreanDollLikeness', weight: 0.8 }],
   })
   @IsOptional()
   @IsArray()
   resources?: Record<string, any>[];
-  
-  // workflow and rawParams usually strictly from file, unlikely user manually inputs massive JSON, 
+
+  // workflow and rawParams usually strictly from file, unlikely user manually inputs massive JSON,
   // but we can allow if really needed. For now let's stick to editable text/numbers.
 }

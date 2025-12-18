@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { RedisModule } from '@nestjs-modules/ioredis';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AppController } from './app.controller';
 
@@ -40,6 +41,17 @@ import { SearchModule } from './search/search.module';
     StorageModule,
     ImagesModule,
     SearchModule,
+    RedisModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        type: 'single',
+        url: `redis://${configService.get('REDIS_HOST', 'localhost')}:${configService.get('REDIS_PORT', '6379')}`,
+        options: {
+          password: configService.get('REDIS_PASSWORD'),
+        },
+      }),
+    }),
     EventEmitterModule.forRoot(),
   ],
   controllers: [AppController],

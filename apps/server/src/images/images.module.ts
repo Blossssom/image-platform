@@ -10,14 +10,13 @@ import { ImagesRepository } from './images.repository';
 // Wait, previous logs showed StorageModule in ../storage/storage.module but lint error says otherwise.
 import { StorageModule } from '../common/file-storage/storage.module';
 import { MetadataService } from './metadata.service';
-// import { SearchModule } from '../search/search.module';
-
+import { SearchModule } from '../search/search.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Images, ImageMetadata, Users]),
     StorageModule,
-    // SearchModule // Decoupled
+    SearchModule,
   ],
   controllers: [ImagesController],
   providers: [ImagesService, ImagesRepository, MetadataService],

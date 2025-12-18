@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import { DocumentBuilder, SwaggerModule} from '@nestjs/swagger'
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
@@ -15,15 +15,16 @@ async function bootstrap() {
       whitelist: true, // DTO에 없는 속성 거름
       forbidNonWhitelisted: true, // DTO에 없는 속성 에러처리
       transform: true, // 자동 타입 변환
-    })
+    }),
   );
 
-  if(!isProduction) {
-    const uploadPath = configService.get<string>('LOCAL_UPLOAD_PATH') || '/home/bloxxom/uploads';
-    if(uploadPath) {
+  if (!isProduction) {
+    const uploadPath =
+      configService.get<string>('LOCAL_UPLOAD_PATH') || '/home/bloxxom/uploads';
+    if (uploadPath) {
       app.useStaticAssets(uploadPath, {
         prefix: '/uploads/',
-      })
+      });
     }
   }
 

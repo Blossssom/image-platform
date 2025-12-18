@@ -12,10 +12,12 @@ interface ComfyNode {
 
 @Injectable()
 export class MetadataService {
-  async extractMetadata(metadata: sharp.Metadata): Promise<Partial<ImageMetadata>> {
+  async extractMetadata(
+    metadata: sharp.Metadata,
+  ): Promise<Partial<ImageMetadata>> {
     const result: Partial<ImageMetadata> = {};
     const meta = metadata as any;
-    
+
     // 1. Handle PNG Comments (ComfyUI / A1111)
     if (meta.comments && Array.isArray(meta.comments)) {
       for (const comment of meta.comments) {
@@ -24,7 +26,7 @@ export class MetadataService {
           const params = this.parseGenerationParameters(comment.text);
           Object.assign(result, params);
         }
-        
+
         // ComfyUI API Format (prompt)
         if (comment.keyword === 'prompt') {
           try {
@@ -32,7 +34,7 @@ export class MetadataService {
             const sanitizedText = comment.text.replace(/: NaN/g, ': null');
             const json = JSON.parse(sanitizedText);
             result.rawParams = json; // Save full API graph to rawParams
-            
+
             // Attempt to extract basic stats from ComfyUI graph
             const extracted = this.parseComfyUIPrompt(json);
             Object.assign(result, extracted);
@@ -43,11 +45,11 @@ export class MetadataService {
 
         // ComfyUI Workflow (UI Graph)
         if (comment.keyword === 'workflow') {
-           try {
+          try {
             result.workflow = JSON.parse(comment.text);
-           } catch (e) {
-             console.warn('Failed to parse ComfyUI workflow:', e);
-           }
+          } catch (e) {
+            console.warn('Failed to parse ComfyUI workflow:', e);
+          }
         }
       }
     }
@@ -58,17 +60,19 @@ export class MetadataService {
         const parsedExif = exif(metadata.exif) as any;
         // UserComment (0x9286) often contains generation params in A1111 JPEG
         if (parsedExif.exif && parsedExif.exif.UserComment) {
-          const userComment = this.decodeUserComment(parsedExif.exif.UserComment);
+          const userComment = this.decodeUserComment(
+            parsedExif.exif.UserComment,
+          );
           if (userComment) {
-             const params = this.parseGenerationParameters(userComment);
-             Object.assign(result, params);
+            const params = this.parseGenerationParameters(userComment);
+            Object.assign(result, params);
           }
         }
       } catch (error) {
         console.warn('Failed to parse Exif:', error);
       }
     }
-    
+
     return result;
   }
 
@@ -100,23 +104,27 @@ export class MetadataService {
 
       const safeCfg = this.extractNumeric(inputs.cfg, true, true); // Float
       if (safeCfg) result.cfgScale = Number(safeCfg);
-      
+
       const safeGuidance = this.extractNumeric(inputs.guidance, true, true);
       if (safeGuidance) result.cfgScale = Number(safeGuidance);
-      
+
       if (inputs.sampler_name && !Array.isArray(inputs.sampler_name)) {
-         result.sampler = inputs.sampler_name;
-         if (inputs.scheduler && !Array.isArray(inputs.scheduler)) result.sampler += ` (${inputs.scheduler})`;
+        result.sampler = inputs.sampler_name;
+        if (inputs.scheduler && !Array.isArray(inputs.scheduler))
+          result.sampler += ` (${inputs.scheduler})`;
       }
 
-      if (inputs.ckpt_name && !Array.isArray(inputs.ckpt_name)) result.modelHash = inputs.ckpt_name;
-      if (inputs.unet_name && !Array.isArray(inputs.unet_name)) result.modelHash = inputs.unet_name;
-      if (inputs.model_name && !Array.isArray(inputs.model_name)) result.modelHash = inputs.model_name; // UpscaleModelLoader
-      
+      if (inputs.ckpt_name && !Array.isArray(inputs.ckpt_name))
+        result.modelHash = inputs.ckpt_name;
+      if (inputs.unet_name && !Array.isArray(inputs.unet_name))
+        result.modelHash = inputs.unet_name;
+      if (inputs.model_name && !Array.isArray(inputs.model_name))
+        result.modelHash = inputs.model_name; // UpscaleModelLoader
+
       // Detect img2img: present if LoadImage node exists (and is not just a mask or controlnet input - simplification)
       // Usually LoadImage + VAEEncode indicates img2img
       if (node.class_type === 'LoadImage') {
-         result.generationMethod = GenerationMethod.Img2Img;
+        result.generationMethod = GenerationMethod.Img2Img;
       }
     }
 
@@ -128,7 +136,12 @@ export class MetadataService {
       const node = nodes[id];
       const type = String(node.class_type);
 
-      if (type.includes('Select') || type.includes('Provider') || type.includes('Option')) continue;
+      if (
+        type.includes('Select') ||
+        type.includes('Provider') ||
+        type.includes('Option')
+      )
+        continue;
 
       if (type.includes('UltimateSDUpscale') || type.includes('KSampler')) {
         samplerNode = node;
@@ -155,16 +168,25 @@ export class MetadataService {
       // A. Text Node found
       if (
         (type.includes('CLIPTextEncode') || type.includes('Prompt')) &&
-        (inputs.text || inputs.text_g || inputs.text_l || inputs.clip_l || inputs.t5xxl)
+        (inputs.text ||
+          inputs.text_g ||
+          inputs.text_l ||
+          inputs.clip_l ||
+          inputs.t5xxl)
       ) {
         const texts: string[] = [];
         // Only push if it's a string (not a link array)
-        if (inputs.text && typeof inputs.text === 'string') texts.push(inputs.text);
-        if (inputs.text_g && typeof inputs.text_g === 'string') texts.push(inputs.text_g);
-        if (inputs.text_l && typeof inputs.text_l === 'string') texts.push(inputs.text_l);
-        if (inputs.clip_l && typeof inputs.clip_l === 'string') texts.push(inputs.clip_l);
-        if (inputs.t5xxl && typeof inputs.t5xxl === 'string') texts.push(inputs.t5xxl);
-        
+        if (inputs.text && typeof inputs.text === 'string')
+          texts.push(inputs.text);
+        if (inputs.text_g && typeof inputs.text_g === 'string')
+          texts.push(inputs.text_g);
+        if (inputs.text_l && typeof inputs.text_l === 'string')
+          texts.push(inputs.text_l);
+        if (inputs.clip_l && typeof inputs.clip_l === 'string')
+          texts.push(inputs.clip_l);
+        if (inputs.t5xxl && typeof inputs.t5xxl === 'string')
+          texts.push(inputs.t5xxl);
+
         return texts
           .filter((t) => typeof t === 'string' && t.trim())
           .join('\n');
@@ -214,12 +236,11 @@ export class MetadataService {
 
       // Attempt to find model name from inputs if linked
       // This is harder as it requires tracing 'model' input back to a checkpoint loader
-      
+
       // Attempt to find model name from inputs if linked
       // This is harder as it requires tracing 'model' input back to a checkpoint loader
-    } 
+    }
     // If no sampler node found, we could fallback to the old method, but for now strict extraction is safer to avoid garbage.
-
 
     // 5. Extract Resources (LoRAs)
     result.resources = this.extractResources('ComfyUI', json);
@@ -255,14 +276,17 @@ export class MetadataService {
         if (type.includes('LoraLoader')) {
           // Standard LoraLoader / LoraLoaderModelOnly
           const name = inputs.lora_name;
-          const strength = inputs.strength_model !== undefined ? inputs.strength_model : inputs.strength_clip;
-          
+          const strength =
+            inputs.strength_model !== undefined
+              ? inputs.strength_model
+              : inputs.strength_clip;
+
           if (name) {
-             resources.push({
-               type: 'lora',
-               name: name,
-               weight: typeof strength === 'number' ? strength : 1.0,
-             });
+            resources.push({
+              type: 'lora',
+              name: name,
+              weight: typeof strength === 'number' ? strength : 1.0,
+            });
           }
         }
       }
@@ -277,11 +301,11 @@ export class MetadataService {
       // or just try to decode as utf8
       const str = data.toString('utf8');
       if (str.startsWith('UNICODE\0')) {
-         return str.substring(8).replace(/\0/g, ''); // Remove prefix and nulls
+        return str.substring(8).replace(/\0/g, ''); // Remove prefix and nulls
       }
       return str.replace(/\0/g, '');
     } else if (typeof data === 'string') {
-        return data.replace(/\0/g, '');
+      return data.replace(/\0/g, '');
     }
     return null;
   }
@@ -304,9 +328,13 @@ export class MetadataService {
 
     // 2. Negative Prompt
     if (negativePromptIndex !== -1) {
-      const negativePromptEndIndex = stepsIndex !== -1 ? stepsIndex : text.length;
+      const negativePromptEndIndex =
+        stepsIndex !== -1 ? stepsIndex : text.length;
       result.negativePrompt = text
-        .substring(negativePromptIndex + 'Negative prompt:'.length, negativePromptEndIndex)
+        .substring(
+          negativePromptIndex + 'Negative prompt:'.length,
+          negativePromptEndIndex,
+        )
         .trim();
     }
 
@@ -336,24 +364,26 @@ export class MetadataService {
             result.modelHash = value;
             break;
           case 'Model':
-             // Model name could be stored if we had a field for it, or mapped to generationTool/Method
-             break;
+            // Model name could be stored if we had a field for it, or mapped to generationTool/Method
+            break;
         }
       });
-      
+
       result.rawParams = { raw: paramsText }; // Store raw params for reference
     }
-    
-    
+
     // Default tool/method if we detected parameters
     if (result.steps || result.modelHash) {
-        result.generationTool = GenerationTool.WebUI; // A1111 / WebUI
-        // result.generationMethod = GenerationMethod.Txt2Img; // Removed default as per user request
-        
-        // Extract Resources from prompt
-        if (result.positivePrompt) {
-          result.resources = this.extractResources('A1111', result.positivePrompt);
-        }
+      result.generationTool = GenerationTool.WebUI; // A1111 / WebUI
+      // result.generationMethod = GenerationMethod.Txt2Img; // Removed default as per user request
+
+      // Extract Resources from prompt
+      if (result.positivePrompt) {
+        result.resources = this.extractResources(
+          'A1111',
+          result.positivePrompt,
+        );
+      }
     }
 
     return result;
@@ -383,7 +413,7 @@ export class MetadataService {
         return asNumber ? Number(str) : str;
       }
     }
-    
+
     return undefined;
   }
 }
