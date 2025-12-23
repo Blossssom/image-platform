@@ -148,7 +148,7 @@ export class ImagesService {
 
     if (cachedData) {
       this.logger.log(`[Cache HIT] Image ${id} served from Redis`);
-      return JSON.parse(cachedData);
+      return JSON.parse(cachedData) as ImageDetailDto;
     }
 
     this.logger.log(`[Cache MISS] Image ${id} fetched from DB`);
